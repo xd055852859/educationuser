@@ -30,7 +30,7 @@ export const lessonStore = defineStore(
     };
 
     const getLessonInfo = async (key) => {
-      const lessonInfoRes = (await api.request.get("/resource/detail", {
+      const lessonInfoRes = (await api.request.get("resource/detail", {
         resourceKey: key,
       })) as ResultProps;
       if (lessonInfoRes.msg === "OK") {

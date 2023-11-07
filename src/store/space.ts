@@ -71,6 +71,15 @@ export const spaceStore = defineStore(
         getSpaceInfo(newKey);
       }
     });
+    watch([spaceList, spaceKey], ([newList, newKey]) => {
+      if (newKey) {
+        let index = _.findIndex(newList, { _key: newKey });
+        if (index === -1) {
+          router.replace("/space");
+          localStorage.removeItem("spaceKey");
+        }
+      }
+    });
     return {
       spaceKey,
       setSpaceKey,

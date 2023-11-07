@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Header from "@/components/header.vue";
 import appStore from "@/store";
 import { storeToRefs } from "pinia";
 import { ROLE_OPTIONS, ResultProps } from "@/interface/Common";
@@ -14,15 +15,17 @@ const toSpace = (spaceItem) => {
 };
 </script>
 <template>
+  <Header />
   <div class="space">
     <div class="space-box">
       <div class="space-logo">
-        <img src="/common/logoTitle.svg" alt="" />
+        <img src="/login/logoTitle.svg" alt="" />
       </div>
       <div
         class="space-container"
-        :style="{
-          height: createState ? 'calc(100% - 160px)' : 'calc(100% - 105px)',
+        :class="{
+          'space-container-large': createState,
+          'space-container-small': !createState,
         }"
       >
         <el-card
@@ -34,11 +37,7 @@ const toSpace = (spaceItem) => {
           <!--             -->
           <div class="space-list-item" @click="toSpace(item)">
             <div class="space-list-img">
-              <img
-                :src="item.logo"
-                alt=""
-                v-if="item.logo"
-              />
+              <img :src="item.logo" alt="" v-if="item.logo" />
               <img
                 src="/logo.svg"
                 alt=""
@@ -49,14 +48,24 @@ const toSpace = (spaceItem) => {
             <div class="title">
               <div class="top">{{ item.name }}</div>
               <div class="bottom">
-                <div>{{ ROLE_OPTIONS[item.role]?.label }}</div>
+                <div>
+                  {{
+                    item.role === 0
+                      ? "超管"
+                      : ROLE_OPTIONS[item.role - 1]?.label
+                  }}
+                </div>
               </div>
             </div>
           </div>
         </el-card>
       </div>
+      <!-- -->
       <div class="space-bottom" v-if="createState">
-        <el-button type="primary" @click="$router.push('/space/edit')"
+        <el-button
+          type="primary"
+          @click="$router.push('/space/edit')"
+          class="space-bottom-button"
           >创建者申请</el-button
         >
       </div>
@@ -66,12 +75,12 @@ const toSpace = (spaceItem) => {
 <style scoped lang="scss">
 .space {
   width: 100vw;
-  height: 100vh;
+  height: calc(100vh - 55px);
   background: #ffffff;
-  @include flex(center, center, null);
+  @include flex(center, flex-start, null);
   .space-box {
-    width: 550px;
-    height: 570px;
+    width: 700px;
+    height: 750px;
     background: #ffffff;
     border-radius: 12px;
     box-shadow: 0px 2px 14px 0px rgba(0, 0, 0, 0.11);
@@ -85,13 +94,18 @@ const toSpace = (spaceItem) => {
       margin-bottom: 25px;
       @include flex(center, center, null);
       img {
-        width: 163px;
-        height: 58px;
+        width: 180px;
+        height: 30px;
       }
+    }
+    .space-container-large {
+      height: calc(100% - 160px);
+    }
+    .space-container-small {
+      height: calc(100% - 105px);
     }
     .space-container {
       width: 100%;
-
       padding: 0px 34px;
       box-sizing: border-box;
       @include scroll();
@@ -105,7 +119,7 @@ const toSpace = (spaceItem) => {
         cursor: pointer;
         @include flex(space-between, center, wrap);
         .space-list-img {
-          width: 120px;
+          width: 140px;
           height: 90px;
           overflow: hidden;
           @include flex(center, center, null);
@@ -116,13 +130,14 @@ const toSpace = (spaceItem) => {
         }
 
         .title {
-          width: 70%;
+          width: calc(100% - 160px);
           height: 100%;
           .top {
             width: 100%;
             height: calc(100% - 30px);
             padding-top: 10px;
             box-sizing: border-box;
+            font-size: 17px;
             @include flex(null, flex-start, null);
           }
           .bottom {
@@ -154,6 +169,19 @@ const toSpace = (spaceItem) => {
       left: 0px;
       bottom: 20px;
       @include flex(center, center, null);
+      .space-bottom-button {
+        width: 180px;
+        height: 50px;
+        background: #505aff;
+        border-radius: 2px;
+        font-size: 20px;
+        font-family: PingFang SC, PingFang SC-Semibold;
+        font-weight: 600;
+        text-align: center;
+        color: #ffffff;
+        line-height: 33px;
+        letter-spacing: 1.41px;
+      }
     }
   }
 }

@@ -97,15 +97,17 @@ const changeState = async () => {
       v-model="mobile"
       placeholder="请输入手机号"
       class="login-input"
-      autoComplete="off"
+      size="large"
+      autocomplete="new-password"
     >
     </el-input>
     <div class="reset-code">
       <el-input
         v-model="code"
         placeholder="请输入验证码"
-        autoComplete="off"
+        autocomplete="new-password"
         class="login-input"
+        size="large"
         :style="{ width: 'calc(100% - 100px)', marginBottom: '0px' }"
       />
 
@@ -113,7 +115,7 @@ const changeState = async () => {
         type="primary"
         @click="getCode()"
         :disabled="codeState"
-        :style="{ height: '40px', marginLeft: '10px' }"
+        :style="{ marginLeft: '10px' }"
       >
         {{ codeState ? `剩余${codeTime}秒` : "获取验证码" }}
       </el-button>
@@ -125,28 +127,30 @@ const changeState = async () => {
       placeholder="请输入密码"
       show-password
       class="login-input"
-      autoComplete="off"
+      autocomplete="new-password"
       v-if="loginState !== 'codeLogin'"
     />
-    <el-button type="primary" class="login-button" @click="changeState()">
-      {{
-        loginState === "register"
-          ? "注册账号"
-          : loginState === "reset"
-          ? "重置密码"
-          : "验证码登录"
-      }}
-    </el-button>
+    <div class="login-bottom-button">
+      <el-button type="primary" class="login-button" @click="changeState()">
+        {{
+          loginState === "register"
+            ? "注册账号"
+            : loginState === "reset"
+            ? "重置密码"
+            : "验证码登录"
+        }}
+      </el-button>
 
-    <div
-      class="login-prompt"
-      @click="setLoginState('login')"
-      v-if="loginState === 'register' || loginState === 'codeLogin'"
-    >
-      已有账号？<span>直接登录</span>
-    </div>
-    <div class="login-prompt" @click="setLoginState('register')" v-else>
-      没有飞梭账户？<span>立即注册</span>
+      <div
+        class="login-prompt"
+        @click="setLoginState('login')"
+        v-if="loginState === 'register' || loginState === 'codeLogin'"
+      >
+        已有账号？<span>直接登录</span>
+      </div>
+      <div class="login-prompt" @click="setLoginState('register')" v-else>
+        没有场景英语账户？<span>立即注册</span>
+      </div>
     </div>
   </div>
 </template>
@@ -156,7 +160,7 @@ const changeState = async () => {
   height: 40px;
   border-radius: 8px;
   background-color: transparent;
-  margin-bottom: 25px;
+  margin-bottom: 35px;
   @include flex(space-between, center, null);
   .reset-button {
     width: 96px;

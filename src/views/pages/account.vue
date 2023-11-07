@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Plus } from "@element-plus/icons-vue";
+import FontIcon from "@/components/fontIcon.vue";
 import Header from "@/components/header.vue";
 import { ElMessage, type FormInstance, type FormRules } from "element-plus";
 import { checkMobile, checkEmail, uploadFile } from "@/services/util";
@@ -116,7 +116,7 @@ watch(
         ref="ruleFormRef"
         :model="ruleForm"
         :rules="rules"
-        label-width="200px"
+        label-width="150px"
         status-icon
         label-position="left"
         require-asterisk-position="right"
@@ -135,9 +135,7 @@ watch(
               class="upload-cover"
               v-if="ruleForm.logo"
             />
-            <el-icon :size="50" color="#ebebeb" v-else>
-              <Plus />
-            </el-icon>
+            <FontIcon iconName="touxiang" v-else />
             <input
               type="file"
               accept="image/*"
@@ -155,7 +153,7 @@ watch(
           required
           style="margin-bottom: 45px"
         >
-          <el-input v-model="ruleForm.name" size="large" />
+          <el-input v-model="ruleForm.name" size="large" style="width: 70%"/>
         </el-form-item>
         <el-form-item
           label="手机号码"
@@ -163,10 +161,14 @@ watch(
           required
           style="margin-bottom: 45px"
         >
-          <el-input v-model="ruleForm.contact" size="large" />
+          <el-input
+            v-model="ruleForm.contact"
+            size="large"
+            style="width: 70%"
+          />
         </el-form-item>
         <el-form-item label="电子邮箱" prop="email" style="margin-bottom: 45px">
-          <el-input v-model="ruleForm.email" size="large" />
+          <el-input v-model="ruleForm.email" size="large" style="width: 70%" />
         </el-form-item>
       </el-form>
     </div>
@@ -181,13 +183,15 @@ watch(
   .account-container {
     width: 100%;
     height: 100%;
-    min-width: 600px;
+    padding: 40px 57px 34px 57px;
+    box-sizing: border-box;
     @include scroll();
-    @include p-number(10px, 15%);
+
     @include flex(center, flex-start, null);
     .logo-box {
-      width: 200px;
-      height: 200px;
+      width: 82px;
+      height: 82px;
+      background: #b9c4fc;
       border-radius: 12px;
       overflow: hidden;
       .logo-item {
@@ -211,4 +215,13 @@ watch(
   }
 }
 </style>
-<style></style>
+<style lang="scss">
+.account-container {
+  .logo-box {
+    .font-icon {
+      font-size: 40px;
+      color: #fff;
+    }
+  }
+}
+</style>

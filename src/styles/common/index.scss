@@ -57,7 +57,7 @@ body,
 
 .box {
   width: 100%;
-  height: calc(100% - 60px);
+  height: calc(100% - 130px);
   position: relative;
   z-index: 1;
   display: flex;
@@ -156,6 +156,7 @@ body,
     }
     .right {
       width: calc(100% - 90px);
+      font-size: 16px;
       @include flex(flex-start, center, null);
       .right-subtitle{
         font-size: 14px;
@@ -197,9 +198,9 @@ body,
     @include flex(center, center, null);
   }
   .select-item-name {
-    // width: calc(100% - 60px);
+    max-width: calc(100% - 60px);
     font-size: 16px;
-    flex: 1;
+    // flex: 1;
     margin: 0px 10px;
   }
   .select-item-icon {
@@ -267,4 +268,11 @@ body,
       display: none !important;
     }
   }
+}
+.common-height{
+  height:32px !important;
+}
+.common-button{
+  width:106px !important;
+  height:42px !important;
 }

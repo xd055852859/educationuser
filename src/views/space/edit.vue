@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Header from "@/components/header.vue";
+import FontIcon from "@/components/fontIcon.vue";
 import { Plus } from "@element-plus/icons-vue";
 import { ElMessage, type FormInstance, type FormRules } from "element-plus";
 import { checkMobile, checkEmail, uploadFile } from "@/services/util";
@@ -75,7 +76,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
 </script>
 <template>
   <div class="space-edit">
-    <Header title="创作者详情" backPath="/space">
+    <Header title="创作者详情" backState @backFunc="$router.push('/space')">
       <template #button>
         <el-button
           type="primary"
@@ -91,12 +92,16 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           ref="ruleFormRef"
           :model="ruleForm"
           :rules="rules"
-          label-width="200px"
+          label-width="150px"
           status-icon
           label-position="left"
           require-asterisk-position="right"
         >
-          <el-form-item label="头像" prop="logo">
+          <el-form-item
+            label="头像"
+            prop="logo"
+            style="margin-top: 45px; margin-bottom: 45px"
+          >
             <div class="upload-button upload-img-button logo-box">
               <img
                 :src="ruleForm.logo"
@@ -105,9 +110,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
                 class="upload-cover"
                 v-if="ruleForm.logo"
               />
-              <el-icon :size="50" color="#ebebeb" v-else>
-                <Plus />
-              </el-icon>
+              <FontIcon iconName="touxiang" v-else />
               <input
                 type="file"
                 accept="image/*"
@@ -119,14 +122,28 @@ const submitForm = async (formEl: FormInstance | undefined) => {
               />
             </div>
           </el-form-item>
-          <el-form-item label="创作者 (机构)" prop="name" required>
+          <el-form-item
+            label="创作者 (机构)"
+            prop="name"
+            required
+            style="margin-bottom: 45px"
+          >
             <el-input v-model="ruleForm.name" size="large" />
           </el-form-item>
-          <el-form-item label="手机号码" prop="contact" required>
+          <el-form-item
+            label="手机号码"
+            prop="contact"
+            required
+            style="margin-bottom: 45px"
+          >
             <el-input v-model="ruleForm.contact" size="large" />
           </el-form-item>
           <el-form-item label="电子邮箱" prop="email">
-            <el-input v-model="ruleForm.email" size="large" />
+            <el-input
+              v-model="ruleForm.email"
+              size="large"
+              style="margin-bottom: 45px"
+            />
           </el-form-item>
         </el-form>
         <div class="edit-subtitle">
@@ -156,8 +173,9 @@ const submitForm = async (formEl: FormInstance | undefined) => {
       @include p-number(10px, 15%);
 
       .logo-box {
-        width: 200px;
-        height: 200px;
+        width: 82px;
+        height: 82px;
+        background: #b9c4fc;
         border-radius: 12px;
         overflow: hidden;
         .logo-item {
@@ -186,4 +204,15 @@ const submitForm = async (formEl: FormInstance | undefined) => {
   }
 }
 </style>
-<style></style>
+<style lang="scss">
+.space-edit {
+  .space-edit-box {
+    .logo-box {
+      .font-icon {
+        font-size: 40px;
+        color: #fff;
+      }
+    }
+  }
+}
+</style>

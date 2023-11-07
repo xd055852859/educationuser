@@ -39,15 +39,24 @@ const routes: Array<RouteRecordRaw> = [
         children: [],
       },
       {
-        path: "lessonCaptions/:id",
+        path: "lessonCaptions/:mediaKey/:mediaIndex",
         name: "lessonCaptions",
         component: () => import("@/views/pages/lesson/captions.vue"),
         children: [],
+        props: true,
       },
       {
-        path: "user",
-        name: "user",
-        component: () => import("@/views/pages/user.vue"),
+        path: "lessonArticle/:mediaKey/:mediaIndex",
+        name: "lessonArticle",
+        component: () => import("@/views/pages/lesson/article.vue"),
+        children: [],
+        props: true,
+      },
+      
+      {
+        path: "member",
+        name: "member",
+        component: () => import("@/views/pages/member.vue"),
         children: [],
       },
 
@@ -55,6 +64,12 @@ const routes: Array<RouteRecordRaw> = [
         path: "account",
         name: "account",
         component: () => import("@/views/pages/account.vue"),
+        children: [],
+      },
+      {
+        path: "message",
+        name: "message",
+        component: () => import("@/views/pages/message.vue"),
         children: [],
       },
     ],

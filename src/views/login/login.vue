@@ -51,7 +51,8 @@ const login = async () => {
       v-model="mobile"
       placeholder="请输入手机号"
       class="login-input"
-      autoComplete="off"
+      autocomplete="new-password"
+      size="large"
     >
       <!-- <template #prepend>
         <el-select v-model="mobileArea" placeholder="请选择区号" :style="{width:'70px'}">
@@ -65,17 +66,20 @@ const login = async () => {
       placeholder="请输入密码"
       show-password
       class="login-input"
-      autoComplete="off"
+      autocomplete="new-password"
+      size="large"
     />
     <div class="login-reset">
       <div @click="setLoginState('codeLogin')">验证码登录</div>
       <div @click="setLoginState('reset')">找回密码</div>
     </div>
-    <el-button type="primary" class="login-button" @click="login()">
-      登录
-    </el-button>
-    <div class="login-prompt" @click="setLoginState('register')">
-      没有飞梭账户？<span>立即注册</span>
+    <div class="login-bottom-button">
+      <el-button type="primary" class="login-button" @click="login()">
+        登录
+      </el-button>
+      <div class="login-prompt" @click="setLoginState('register')">
+        没有场景英语账户？<span>立即注册</span>
+      </div>
     </div>
   </div>
 </template>
@@ -87,7 +91,7 @@ const login = async () => {
     text-align: right;
     line-height: 20px;
     margin: 6px 0px 20px 0px;
-    font-size: 14px;
+    font-size: 16px;
 
     @include flex(space-between, center, null);
     > div {

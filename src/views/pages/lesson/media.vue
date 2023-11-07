@@ -1,74 +1,381 @@
 <script setup lang="ts">
 import appStore from "@/store";
 import { storeToRefs } from "pinia";
+import {
+  ElMessage,
+  ElMessageBox,
+  type FormInstance,
+  type FormRules,
+} from "element-plus";
+import { uploadFile, bytesToSize, getUrlDuration } from "@/services/util";
+import api from "@/services/api";
+import { ResultProps } from "@/interface/Common";
+const dayjs: any = inject("dayjs");
+
+const { lessonKey, lessonInfo } = storeToRefs(appStore.lessonStore);
+interface RuleForm {
+  url: string;
+  name: string;
+  uploadType: string;
+}
 const checkBox = ref<boolean>(false);
 const videoList = ref<any>([]);
-const { lessonInfo } = storeToRefs(appStore.lessonStore);
+const fileVisible = ref<boolean>(false);
+const fileSize = ref<number>(0);
+const mediaTime = ref<number>(0);
+const loading = ref<boolean>(false);
+const inputKey = ref<string>("");
+const mediaName = ref<string>("");
+const ruleFormRef = ref<FormInstance>();
+const ruleForm = reactive<RuleForm>({
+  name: "",
+  url: "",
+  uploadType: "inner",
+});
+const rules = reactive<FormRules<RuleForm>>({
+  name: [
+    { required: true, message: "请输入资源名称", trigger: "blur" },
+    // { min: 1, max: 12, message: "请输入不超过", trigger: "blur" },
+  ],
+  url: [
+    { required: true, message: "请输入资源链接", trigger: "blur" },
+    // { min: 1, max: 12, message: "请输入不超过", trigger: "blur" },
+  ],
+});
+onMounted(() => {
+  getData();
+});
+const getData = async () => {
+  let dataRes = (await api.request.get("media", {
+    resourceKey: lessonKey.value,
+  })) as ResultProps;
+  if (dataRes.msg === "OK") {
+    videoList.value = dataRes.data;
+  }
+};
+const uploadImage = (file, type) => {
+  let mimeType: any = [];
+  switch (lessonInfo.value.mediaType) {
+    case "video":
+      mimeType = ["video/*"];
+      break;
+    case "audio":
+      mimeType = ["audio/*"];
+      break;
+    case "pdf":
+      mimeType = ["application/pdf"];
+      break;
+    // case "note":
+    // break;
+  }
+  loading.value = true;
+  if (file) {
+    uploadFile(file, [], async (url, name) => {
+      switch (type) {
+        case "url":
+          loading.value = false;
+          console.log(file);
+          fileSize.value = file.size;
+          ruleForm.url = url;
+          break;
+      }
+    });
+  }
+};
+const submitForm = (formEl: FormInstance | undefined) => {
+  if (
+    (lessonInfo.value.mediaType === "video" ||
+      lessonInfo.value.mediaType === "audio") &&
+    ruleForm.uploadType === "inner"
+  ) {
+    console.log(ruleForm.url);
+    getUrlDuration(ruleForm.url, (time) => {
+      console.log(time);
+      mediaTime.value = time;
+      saveForm(formEl);
+    });
+  } else {
+    saveForm(formEl);
+  }
+};
+const saveForm = async (formEl: FormInstance | undefined) => {
+  if (!formEl) return;
+  await formEl.validate(async (valid, fields) => {
+    console.log(valid);
+    if (valid) {
+      let fileRes = (await api.request.post("media", {
+        resourceKey: lessonKey.value,
+        name: ruleForm.name,
+        url: ruleForm.url,
+        fileSize: fileSize.value,
+        mediaTime: mediaTime.value,
+      })) as ResultProps;
+      if (fileRes.msg === "OK") {
+        ElMessage.success("新增资源成功");
+        fileVisible.value = false;
+        videoList.value.push(fileRes.data);
+        clearForm();
+      }
+    } else {
+      console.log("error submit!", fields);
+    }
+  });
+};
+const clearForm = () => {
+  ruleForm.name = "";
+  ruleForm.url = "";
+  ruleForm.uploadType = "inner";
+  fileSize.value = 0;
+  mediaTime.value = 0;
+};
+const deleteMedia = async (key, index) => {
+  ElMessageBox.confirm("是否删除该资源", "删除资源", {
+    confirmButtonText: "确认",
+    cancelButtonText: "取消",
+  }).then(async () => {
+    const delRes = (await api.request.delete("media", {
+      mediaKey: key,
+    })) as ResultProps;
+    if (delRes.msg === "OK") {
+      ElMessage.success("删除资源成功");
+      videoList.value.splice(index, 1);
+    }
+  });
+};
+const updateMedia = async (key, value, index) => {
+  let updateRes = (await api.request.patch("media", {
+    mediaKey: inputKey.value,
+    [key]: value,
+  })) as ResultProps;
+  if (updateRes.msg === "OK") {
+    videoList.value[index][key] = value;
+    inputKey.value = "";
+    mediaName.value = "";
+  }
+};
 </script>
 <template>
-  <div class="media">
-    <div class="edit-item-title">
-      <div class="edit-title-left">视频</div>
+  <div class="media" v-if="lessonInfo">
+    <div class="media-title">
+      <div class="edit-title-left" style="font-size: 16px">
+        {{
+          lessonInfo.mediaType === "video"
+            ? "视频"
+            : lessonInfo.mediaType === "audio"
+            ? "音频"
+            : "文章"
+        }}
+      </div>
       <div class="edit-title-right">
-        <el-button type="primary" style="margin-right: 15px" size="small"
+        <el-button
+          type="primary"
+          style="margin-right: 15px"
+          size="small"
+          @click="fileVisible = true"
           >添加</el-button
         >
         <el-button type="primary" size="small">批量导入</el-button>
       </div>
     </div>
-    <div class="edit-item-table">
-      <el-table :data="videoList" fit style="width: 100%">
-        <el-table-column label="序号" type="index" width="70" />
-        <el-table-column prop="name" label="视频地址" align="center" />
-        <el-table-column prop="tagName" label="名称" align="center" />
+    <div class="media-table">
+      <el-table :data="videoList" style="width: 100%" stripe fit>
+        <el-table-column label="序号" type="index" width="70" align="center" />
         <el-table-column label="名称" align="center">
           <template #default="scope">
-            <div>
-              <el-checkbox v-model="checkBox" label="字幕" size="large" />
-              <el-button
-                v-if="lessonInfo && checkBox"
-                type="primary"
-                size="small"
-                @click=""
-                >编辑字幕</el-button
-              >
+            <el-input
+              v-model="mediaName"
+              placeholder="请输入资源名"
+              v-if="inputKey === scope.row._key"
+              @change="updateMedia('name', mediaName, scope.$index)"
+              size="large"
+            />
+            <div
+              v-else
+              @click="
+                inputKey = scope.row._key;
+                mediaName = scope.row.name;
+              "
+            >
+              {{ scope.row.name }}
             </div>
           </template>
         </el-table-column>
-        <!--  <el-table-column prop="imgList" label="图片" align="center" width="450">
-        <template #default="scope">
-          <div class="story-img">
-            <div
-              class="story-img-item"
-              v-for="(item, index) in scope.row.imgList"
-              :key="'image' + index"
-            >
-              <el-image
-                style="width: 70px; height: 70px"
-                :src="item + '?imageView2/1/w/200/h/200'"
-                :preview-src-list="scope.row.imgList"
-                :initial-index="index"
-                fit="cover"
-                preview-teleported
-              />
-            </div>
-          </div>
-        </template>
-      </el-table-column> -->
-
-        <el-table-column fixed="right" label="操作" width="180" align="center">
+        <el-table-column
+          prop="url"
+          label="资源地址"
+          header-align="center"
+          v-if="lessonInfo.mediaType !== 'pdf'"
+        />
+        <el-table-column
+          label="时长"
+          align="center"
+          width="140"
+          v-if="lessonInfo.mediaType !== 'pdf'"
+        >
           <template #default="scope">
-            <el-button link type="primary" size="small" @click=""
+            {{
+              dayjs.duration(scope.row.mediaTime, "seconds").format("HH:mm:ss")
+            }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="大小"
+          align="center"
+          width="140"
+          v-if="lessonInfo.mediaType !== 'pdf'"
+        >
+          <template #default="scope">
+            {{ scope.row.fileSize ? bytesToSize(scope.row.fileSize) : 0 }}
+          </template>
+        </el-table-column>
+        <el-table-column fixed="right" label="操作" align="center">
+          <template #default="scope">
+            <el-button
+              link
+              type="primary"
+              size="small"
+              @click="
+                lessonInfo.mediaType !== 'pdf'
+                  ? $router.push(
+                      `/home/lessonCaptions/${scope.row._key}/${scope.$index}`
+                    )
+                  : $router.push(
+                      `/home/lessonArticle/${scope.row._key}/${scope.$index}`
+                    )
+              "
               >编辑</el-button
             >
-            <el-button link type="primary" size="small" @click=""
+            <el-button
+              link
+              type="primary"
+              size="small"
+              @click="deleteMedia(scope.row._key, scope.$index)"
               >删除</el-button
             >
           </template>
         </el-table-column>
       </el-table>
     </div>
+    <el-dialog
+      v-model="fileVisible"
+      title="资源设置"
+      width="550px"
+      destroy-on-close
+    >
+      <div class="user-set dp-center-center">
+        <el-form
+          ref="ruleFormRef"
+          :model="ruleForm"
+          :rules="rules"
+          label-width="100px"
+          status-icon
+          label-position="left"
+          require-asterisk-position="right"
+          style="width: calc(100% - 40px)"
+          v-loading="loading"
+          element-loading-text="上传资源中..."
+        >
+          <el-form-item
+            label="名称"
+            prop="name"
+            required
+            style="margin-bottom: 25px"
+          >
+            <el-input
+              v-model="ruleForm.name"
+              placeholder="请输入资源名称"
+              size="large"
+            />
+          </el-form-item>
+          <template v-if="lessonInfo.mediaType !== 'pdf'">
+            <el-form-item
+              label="上传方式"
+              prop="uploadType"
+              style="margin-top: 25px; margin-bottom: 25px"
+            >
+              <el-radio-group v-model="ruleForm.uploadType">
+                <el-radio label="inner">本地上传</el-radio>
+                <el-radio label="outer">外部链接</el-radio>
+              </el-radio-group>
+            </el-form-item>
+            <el-form-item
+              label="链接"
+              prop="uploadType"
+              style="margin-top: 25px; margin-bottom: 25px"
+            >
+              <div v-if="ruleForm.uploadType === 'inner'">
+                <div class="user-set-upload">
+                  <el-button type="primary" @click="">上传资源</el-button>
+                  <input
+                    type="file"
+                    :accept="
+                      lessonInfo.mediaType === 'video'
+                        ? 'video/*'
+                        : lessonInfo.mediaType === 'audio'
+                        ? 'audio/*'
+                        : 'application/pdf'
+                    "
+                    @change="
+                      //@ts-ignore
+                      uploadImage($event.target.files[0], 'url')
+                    "
+                    class="upload-button"
+                  />
+                </div>
+                {{ ruleForm.url }}
+              </div>
+              <el-input
+                v-model="ruleForm.url"
+                placeholder="输入外部链接地址"
+                v-else
+              />
+            </el-form-item>
+          </template>
+        </el-form>
+      </div>
+
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="fileVisible = false">取消</el-button>
+          <el-button type="primary" @click="submitForm(ruleFormRef)"
+            >确认</el-button
+          >
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.media {
+  flex-wrap: wrap;
+  .media-title {
+    width: 100%;
+    height: 50px;
+    color: var(--el-text-color-regular);
+    margin-bottom: 20px;
+    @include flex(space-between, center, null);
+  }
+  .media-table {
+    width: 100%;
+    min-height: 250px;
+  }
+}
+.user-set {
+  height: 320px;
+  .user-set-upload {
+    position: relative;
+    z-index: 1;
+    .upload-button {
+      position: absolute;
+      z-index: 2;
+      top: 0px;
+      bottom: 0px;
+      left: 0px;
+      right: 0px;
+      opacity: 0;
+      cursor: pointer;
+    }
+  }
+}
+</style>
 <style></style>

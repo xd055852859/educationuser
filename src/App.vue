@@ -16,6 +16,10 @@ onMounted(() => {
     let token = localStorage.getItem("auth_token") as string;
     setToken(token);
     api.setToken(token);
+    setDeviceWidth(
+      document.documentElement.offsetWidth,
+      document.documentElement.offsetHeight
+    );
     // navigate("/home");
   } else {
     router.push("/");

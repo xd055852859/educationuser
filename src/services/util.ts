@@ -77,7 +77,7 @@ export const uploadFile = async (
       useCdnDomain: true,
       disableStatisticsReport: false,
       retryCount: 5,
-      region:  qiniu.region["cn-east-2"],
+      region: qiniu.region["cn-east-2"],
       forceDirect: true,
     };
     let observer = {
@@ -136,6 +136,20 @@ export const getBase64 = (file) => {
     reader.onerror = (error) => reject(error);
   });
 };
+export const base64ToFile = (dataurl, filename = "") => {
+  let arr = dataurl.split(",");
+  let mime = arr[0].match(/:(.*?);/)[1];
+  let suffix = mime.split("/")[1];
+  let bstr = atob(arr[1]);
+  let n = bstr.length;
+  let u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new File([u8arr], `${filename}.${suffix}`, {
+    type: mime,
+  });
+};
 export const bytesToSize = (limit) => {
   var size = "";
   if (limit < 1024) {
@@ -143,7 +157,7 @@ export const bytesToSize = (limit) => {
     size = limit.toFixed(2) + "B";
   } else if (limit < 1024 * 1024) {
     //小于0.1MB，则转化成KB
-    size = (limit / 1024).toFixed(2) + "KB";
+    size = limit / 1024 + "KB";
   } else if (limit < 1024 * 1024 * 1024) {
     //小于0.1GB，则转化成MB
     size = (limit / (1024 * 1024)).toFixed(2) + "MB";
@@ -202,20 +216,39 @@ export const downloadFile = (url, fileName) => {
       URL.revokeObjectURL(href);
     });
 };
+//获取视频时长
+export const getFileDuration = (file, callback) => {
+  let reader = new FileReader();
+  reader.onload = function () {
+    getUrlDuration(reader.result, callback);
+  };
+  reader.readAsDataURL(file);
+};
+export const getUrlDuration = (url, callback) => {
+  let video: any = document.createElement("video");
+  video.src = url;
+  video.addEventListener("loadedmetadata", function () {
+    var duration = video.duration;
+    callback(duration);
+    console.log(duration);
+  });
+};
 //转换树
 export const formatData = (nodes: any, nodeId: string) => {
   let obj: any = {
     ...nodes[nodeId],
-    key: nodeId,
-    label: nodes[nodeId].name,
     children: [],
+    label: nodes[nodeId].name,
   };
 
-  if (nodes[nodeId].sortList.length > 0) {
-    nodes[nodeId].sortList.forEach((item: any) => {
+  if (nodes[nodeId].children && nodes[nodeId].children.length > 0) {
+    // obj.disabled = true;
+    nodes[nodeId].children.forEach((item: any) => {
       let nodeItem = formatData(nodes, item);
       obj.children.push(nodeItem);
     });
+  } else {
+    // obj.disabled = false;
   }
   return obj;
 };
@@ -321,4 +354,27 @@ export const checkPassword = (rule: any, value: any, callback: any) => {
   } else {
     callback();
   }
+};
+//获取屏幕比例
+export const detectZoom = () => {
+  var ratio = 0,
+    screen: any = window.screen,
+    ua = navigator.userAgent.toLowerCase();
+
+  if (window.devicePixelRatio !== undefined) {
+    ratio = window.devicePixelRatio;
+  } else if (~ua.indexOf("msie")) {
+    if (screen?.deviceXDPI && screen?.logicalXDPI) {
+      ratio = screen.deviceXDPI / screen.logicalXDPI;
+    }
+  } else if (
+    window.outerWidth !== undefined &&
+    window.innerWidth !== undefined
+  ) {
+    ratio = window.outerWidth / window.innerWidth;
+  }
+  if (ratio) {
+    ratio = Math.round(ratio * 100) / 100;
+  }
+  return ratio;
 };

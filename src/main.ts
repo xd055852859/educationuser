@@ -3,26 +3,32 @@ import App from "./App.vue";
 import { createPinia } from "pinia";
 import { registerStore } from "@/store";
 import router from "@/router";
-import dayjs from "dayjs";
+import 'dayjs/locale/zh-cn'
+import relativeTime from "dayjs/plugin/relativeTime";
 import duration from 'dayjs/plugin/duration'
+import weekday from "dayjs/plugin/weekday";
+import dayjs from "dayjs";
 import ElementPlus from "element-plus";
-import zhCn from "element-plus/es/locale/lang/zh-cn";
 import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
+import zhCn from "element-plus/es/locale/lang/zh-cn";
 import "./styles/common/index.scss";
 import "./styles/element/index.scss";
 import "element-plus/dist/index.css";
-
+import "amfe-flexible/index.js";
 const app = createApp(App);
-dayjs.extend(duration)
-app.provide("dayjs", dayjs);
 const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);
+dayjs.extend(weekday)
+dayjs.extend(relativeTime);
+dayjs.extend(duration)
+dayjs.locale("zh-cn");
+app.provide("dayjs", dayjs);
 
 app
   .use(router)
   .use(ElementPlus, {
     locale: zhCn,
   })
-  .use(pinia)
+  .use(pinia);
 registerStore();
 app.mount("#app");

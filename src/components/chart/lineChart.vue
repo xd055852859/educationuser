@@ -1,37 +1,46 @@
 <script setup lang="ts">
+import appStore from "@/store";
 import * as echarts from "echarts";
-
+import { storeToRefs } from "pinia";
+const { deviceHeight, deviceWidth } = storeToRefs(appStore.commonStore);
 const props = defineProps<{
   lineId: string;
   chartData: {
     time: number;
-    length: number;
+    count: number;
   }[];
 }>();
+const dayjs: any = inject("dayjs");
 let chart: any | null = null;
 let option: echarts.EChartsOption | null = null;
-const xAxisData = computed(() =>
-  props.chartData.map((item) => {
-    return item.time;
-  })
-);
-const seriesData = computed(() =>
-  props.chartData.map((item) => {
-    return item.length;
-  })
-);
+const xAxisData = ref<any>(null);
+const seriesData = ref<any>(null);
+
 onMounted(() => {
+  xAxisData.value = props.chartData.map((item) => {
+    return item.time;
+  });
+  seriesData.value = props.chartData.map((item) => {
+    return item.count;
+  });
   let chartDom: any = document.getElementById(props.lineId);
-  chart = echarts.init(chartDom);
+  chart = echarts.init(chartDom, {
+    width: deviceWidth.value * 0.33,
+    height: deviceHeight.value * 0.2,
+  });
 
   option = {
     xAxis: {
+      name: "日期",
       type: "category",
       data: xAxisData.value,
     },
-    yAxis: {
-      type: "value",
-    },
+    yAxis: [
+      {
+        name: "用户数",
+        type: "value",
+      },
+    ],
     tooltip: {
       trigger: "axis",
     },
@@ -48,7 +57,12 @@ onMounted(() => {
 watch(
   () => props.chartData,
   (newVal) => {
-    console.log(newVal);
+    xAxisData.value = newVal.map((item) => {
+      return item.time;
+    });
+    seriesData.value = newVal.map((item) => {
+      return item.count;
+    });
     //@ts-ignore
     chart.setOption<echarts.EChartsOption>({
       xAxis: {

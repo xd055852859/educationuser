@@ -39,10 +39,10 @@ export enum ROLELIST {
   "Member" = 4,
 }
 export const ROLE_OPTIONS = [
-  {
-    label: "超管",
-    value: ROLELIST.SuperAdmin,
-  },
+  // {
+  //   label: "超管",
+  //   value: ROLELIST.SuperAdmin,
+  // },
   {
     label: "管理员",
     value: ROLELIST.Admin,
@@ -56,7 +56,7 @@ export const ROLE_OPTIONS = [
     value: ROLELIST.author,
   },
   {
-    label: "成员",
+    label: "只读",
     value: ROLELIST.Member,
   },
 ];

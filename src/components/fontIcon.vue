@@ -14,9 +14,19 @@ const emits = defineEmits<{
     :class="customClassName"
     @click="emits('iconClick')"
     :style="{ ...boxStyle }"
+    class="font-icon-box dp-center-center"
   >
-    <i :class="`iconfont icon-${iconName}`" :style="{ ...iconStyle }" />
+    <i
+      :class="`iconfont icon-${iconName}`"
+      class="font-icon"
+      :style="{ ...iconStyle }"
+    />
   </div>
 </template>
-<style scoped lang="scss"></style>
+<style lang="scss">
+.font-icon-box {
+  width: 100%;
+  height: 100%;
+}
+</style>
 <style></style>

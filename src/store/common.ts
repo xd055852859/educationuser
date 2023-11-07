@@ -1,5 +1,6 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
+import { detectZoom } from "@/services/util";
 
 // 使用setup模式定义
 export const commonStore = defineStore("commonStore", () => {
@@ -7,12 +8,14 @@ export const commonStore = defineStore("commonStore", () => {
   const deviceWidth = ref<number>(0);
   const deviceHeight = ref<number>(0);
   const deviceSize = ref<string>("md");
+  const deviceZoom = ref<number>(0);
   const site = ref<string>("sg");
   const chooseKey = ref<string>("");
   const chooseType = ref<string>("");
   const overKey = ref<string>("");
   const overType = ref<string>("");
-  const closeNum = ref<number>(-1);
+  const messageNum = ref<number>(0);
+
   const fullState = ref<boolean>(false);
   const setDeviceType = (newDeviceType: string) => {
     deviceType.value = newDeviceType;
@@ -22,8 +25,9 @@ export const commonStore = defineStore("commonStore", () => {
     localStorage.setItem("site", newSite);
   };
   const setDeviceWidth = (width: number, height: number) => {
-    deviceWidth.value = width;
-    deviceHeight.value = height;
+    deviceZoom.value = detectZoom();
+    deviceWidth.value = width * deviceZoom.value;
+    deviceHeight.value = height * deviceZoom.value;
     if (width < 550) {
       deviceSize.value = "xs";
     } else if (550 <= width) {
@@ -44,8 +48,9 @@ export const commonStore = defineStore("commonStore", () => {
     overKey.value = newKey;
     overType.value = newType;
   };
-  const setClose = (newNum) => {
-    closeNum.value = newNum;
+
+  const setMessageNum = (newNum) => {
+    messageNum.value = newNum;
   };
   const setFullState = (newFullState) => {
     fullState.value = newFullState;
@@ -65,8 +70,8 @@ export const commonStore = defineStore("commonStore", () => {
     overKey,
     overType,
     setOver,
-    closeNum,
-    setClose,
+    messageNum,
+    setMessageNum,
     fullState,
     setFullState,
   };
