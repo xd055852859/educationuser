@@ -22,6 +22,8 @@ onMounted(() => {
     );
     // navigate("/home");
   } else {
+    setToken("");
+    api.setToken("");
     router.push("/");
   }
 });

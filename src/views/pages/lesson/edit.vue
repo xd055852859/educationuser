@@ -332,9 +332,7 @@ watch(
           :disabled="lessonKey !== ''"
           size="large"
         >
-          <el-radio label="pdf" v-if="ruleForm.tagType === 'inner'"
-            >文章</el-radio
-          >
+          <el-radio label="pdf">文章</el-radio>
           <el-radio label="video" v-if="ruleForm.tagType === 'outer'"
             >视频</el-radio
           >

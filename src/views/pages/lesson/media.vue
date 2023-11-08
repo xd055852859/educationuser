@@ -234,16 +234,24 @@ const updateMedia = async (key, value, index) => {
               link
               type="primary"
               size="small"
+              v-if="lessonInfo.mediaType !== 'pdf'"
               @click="
-                lessonInfo.mediaType !== 'pdf'
-                  ? $router.push(
-                      `/home/lessonCaptions/${scope.row._key}/${scope.$index}`
-                    )
-                  : $router.push(
-                      `/home/lessonArticle/${scope.row._key}/${scope.$index}`
-                    )
+                $router.push(
+                  `/home/lessonCaptions/${scope.row._key}/${scope.$index}`
+                )
               "
               >编辑</el-button
+            >
+            <el-button
+              link
+              type="primary"
+              size="small"
+              @click="
+                $router.push(
+                  `/home/lessonArticle/${scope.row._key}/${scope.$index}`
+                )
+              "
+              >文章</el-button
             >
             <el-button
               link
@@ -288,7 +296,7 @@ const updateMedia = async (key, value, index) => {
             />
           </el-form-item>
           <template v-if="lessonInfo.mediaType !== 'pdf'">
-            <el-form-item
+            <!-- <el-form-item
               label="上传方式"
               prop="uploadType"
               style="margin-top: 25px; margin-bottom: 25px"
@@ -297,7 +305,7 @@ const updateMedia = async (key, value, index) => {
                 <el-radio label="inner">本地上传</el-radio>
                 <el-radio label="outer">外部链接</el-radio>
               </el-radio-group>
-            </el-form-item>
+            </el-form-item> -->
             <el-form-item
               label="链接"
               prop="uploadType"

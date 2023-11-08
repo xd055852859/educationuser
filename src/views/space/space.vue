@@ -135,15 +135,13 @@ const toSpace = (spaceItem) => {
           .top {
             width: 100%;
             height: calc(100% - 30px);
-            padding-top: 10px;
-            box-sizing: border-box;
-            font-size: 17px;
+            font-size: 22px;
             @include flex(null, flex-start, null);
           }
           .bottom {
             width: 100%;
             height: 30px;
-            font-size: 14px;
+            font-size: 18px;
             color: #9e9e9e;
             padding-right: 10px;
             box-sizing: border-box;

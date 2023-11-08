@@ -12,7 +12,8 @@ axios.interceptors.response.use(
       localStorage.clear();
       sessionStorage.clear();
       router.replace("/");
-    } else if (response.data.status === 201) {
+      token = "";
+    } else if (response.data.status !== 200) {
       ElMessage.error(response.data.msg);
     }
     return response;

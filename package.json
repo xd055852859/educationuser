@@ -25,6 +25,7 @@
     "qiniu-js": "^3.4.1",
     "sass": "^1.68.0",
     "sass-loader": "^13.3.2",
+    "sortablejs": "^1.15.0",
     "unplugin-auto-import": "^0.16.6",
     "unplugin-vue-components": "^0.25.2",
     "vue": "^3.3.4",

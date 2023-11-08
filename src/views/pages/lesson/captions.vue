@@ -393,17 +393,7 @@ const toUrl = () => {
               </div></template
             >
           </el-table-column>
-          <el-table-column
-            prop="translation"
-            label="译文"
-            header-align="center"
-          >
-            <template #default="scope">
-              <div class="captions-table-text">
-                {{ scope.row.translation }}
-              </div></template
-            ></el-table-column
-          >
+
           <el-table-column
             fixed="right"
             label="操作"
@@ -510,21 +500,9 @@ const toUrl = () => {
           <div class="right">
             <el-input
               v-model="original"
-              :rows="6"
+              :rows="8"
               type="textarea"
               placeholder="请输入原文"
-              size="large"
-            />
-          </div>
-        </div>
-        <div class="input-item info-area">
-          <div class="left">译文</div>
-          <div class="right">
-            <el-input
-              v-model="translation"
-              :rows="6"
-              type="textarea"
-              placeholder="请输入译文"
               size="large"
             />
           </div>
