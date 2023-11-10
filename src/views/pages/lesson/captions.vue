@@ -291,7 +291,7 @@ const removeCaptions = async () => {
 };
 const toUrl = () => {
   previewVisible.value = true;
-  previewUrl.value = `https://yujing.qingtime.cn/#/preview/${lessonInfo.value?._key}?token=${token.value}&type=back&index=${props.mediaIndex}`;
+  previewUrl.value = `https://cjyy.qingtime.cn/#/preview/${lessonInfo.value?._key}?token=${token.value}&type=back&index=${props.mediaIndex}`;
 };
 </script>
 <template>

@@ -11,7 +11,7 @@ const previewVisible = ref<boolean>(false);
 const previewUrl = ref<string>("");
 const toUrl = () => {
   previewVisible.value = true;
-  previewUrl.value = `https://yujing.qingtime.cn/#/preview/${lessonInfo.value?._key}?token=${token.value}&type=back`;
+  previewUrl.value = `https://cjyy.qingtime.cn/#/preview/${lessonInfo.value?._key}?token=${token.value}&type=back`;
 };
 </script>
 <template>
@@ -65,7 +65,7 @@ const toUrl = () => {
       <div class="detail-item">
         <div class="detail-item-left">链接</div>
         <div class="detail-item-right" @click="toUrl">
-          {{ `https://yujing.qingtime.cn/#/preview/${lessonInfo?._key}` }}
+          {{ `https://cjyy.qingtime.cn/#/preview/${lessonInfo?._key}` }}
         </div>
       </div>
     </div>

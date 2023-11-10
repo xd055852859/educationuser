@@ -110,88 +110,98 @@ watchEffect(() => {
       </div>
     </div>
     <div class="lesson-list">
-      <div
-        class="lesson-list-item"
-        v-for="(item, index) in lessonList"
-        :key="`lesson${item._key}`"
-        @click="toLesson(item._key)"
-      >
-        <div class="lesson-list-img">
-          <img :src="item.cover" alt="" v-if="item.cover" />
-          <img
-            src="/logo.svg"
-            alt=""
-            style="width: 80px; height: 80px; object-fit: contain"
-            v-else
-          />
-          <div
-            class="lesson-list-status"
-            :style="{
-              backgroundImage: `url(${
+      <template v-if="lessonList.length > 0">
+        <div
+          class="lesson-list-item"
+          v-for="(item, index) in lessonList"
+          :key="`lesson${item._key}`"
+          @click="toLesson(item._key)"
+        >
+          <div class="lesson-list-img">
+            <img :src="item.cover" alt="" v-if="item.cover" />
+            <img
+              src="/logo.svg"
+              alt=""
+              style="width: 80px; height: 80px; object-fit: contain"
+              v-else
+            />
+            <div
+              class="lesson-list-status"
+              :style="{
+                backgroundImage: `url(${
+                  item.grounding
+                    ? item.status
+                      ? item.status === 1
+                        ? '/common/info.png'
+                        : '/common/danger.png'
+                      : '/common/default.png'
+                    : '/common/default.png'
+                })`,
+              }"
+            >
+              {{
                 item.grounding
                   ? item.status
                     ? item.status === 1
-                      ? '/common/info.png'
-                      : '/common/danger.png'
-                    : '/common/default.png'
-                  : '/common/default.png'
-              })`,
-            }"
-          >
-            {{
-              item.grounding
-                ? item.status
-                  ? item.status === 1
-                    ? "已发布"
-                    : "已拒绝"
-                  : "待审核"
-                : "待发布"
-            }}
+                      ? "已发布"
+                      : "已拒绝"
+                    : "待审核"
+                  : "待发布"
+              }}
+            </div>
           </div>
-        </div>
-        <div class="title">
-          <div class="top">{{ item.name }}</div>
-          <div class="bottom">
-            {{ item.description }}
+          <div class="title">
+            <div class="top">{{ item.name }}</div>
+            <div class="bottom">
+              {{ item.description }}
+            </div>
           </div>
-        </div>
 
-        <div
-          className="lesson-list-button"
-          @click="$event.stopPropagation()"
-          v-if="
-            spaceRole < 3 || (spaceRole === 4 && item.creator === user?._key)
-          "
-        >
-          <el-dropdown
-            trigger="click"
-            :teleported="false"
-            placement="bottom-start"
+          <div
+            className="lesson-list-button"
+            @click="$event.stopPropagation()"
+            v-if="
+              spaceRole < 3 || (spaceRole === 4 && item.creator === user?._key)
+            "
           >
-            <!-- <FontIcon
+            <el-dropdown
+              trigger="click"
+              :teleported="false"
+              placement="bottom-start"
+            >
+              <!-- <FontIcon
                     iconName="gengduo"
                     :iconStyle="{ fontSize: '18px' }"
                   /> -->
-            <el-icon><MoreFilled /></el-icon>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item @click="toEdit(item._key)">
-                  编辑</el-dropdown-item
-                >
-                <el-dropdown-item
-                  @click="
-                    updateLesson(item._key, 'grounding', !item.grounding, index)
-                  "
-                >
-                  {{ item.grounding ? "取消发布" : "发布" }}
-                </el-dropdown-item>
-                <el-dropdown-item @click="deleteLesson(item._key, index)">
-                  删除</el-dropdown-item
-                >
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
+              <el-icon><MoreFilled /></el-icon>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item @click="toEdit(item._key)">
+                    编辑</el-dropdown-item
+                  >
+                  <el-dropdown-item
+                    @click="
+                      updateLesson(
+                        item._key,
+                        'grounding',
+                        !item.grounding,
+                        index
+                      )
+                    "
+                  >
+                    {{ item.grounding ? "取消发布" : "发布" }}
+                  </el-dropdown-item>
+                  <el-dropdown-item @click="deleteLesson(item._key, index)">
+                    删除</el-dropdown-item
+                  >
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
         </div>
+      </template>
+      <div class="dp-center-center" v-else style="width: 100%; height: 100%">
+        <el-empty description="暂无课程" />
       </div>
     </div>
   </div>

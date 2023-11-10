@@ -103,11 +103,10 @@ watchEffect(() => {
           <span @click="unit = 'year'" :style="unit === 'year'?{color:'#4c56ff'}:{}">年</span>
         </div>
       </div>
-      <div class="overview-content">
+      <div class="overview-content" v-if="chartData">
         <line-chart
           line-id="board-chart"
           :chart-data="chartData"
-          v-if="chartData"
         />
       </div>
     </div>

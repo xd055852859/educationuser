@@ -13,7 +13,7 @@ axios.interceptors.response.use(
       sessionStorage.clear();
       router.replace("/");
       token = "";
-    } else if (response.data.status !== 200) {
+    } else if (response.data.status !== 200 && response.data.msg !== "OK") {
       ElMessage.error(response.data.msg);
     }
     return response;

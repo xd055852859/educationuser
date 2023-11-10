@@ -7,7 +7,7 @@ import { Close } from "@element-plus/icons-vue";
 import api from "@/services/api";
 import appStore from "@/store";
 import _ from "lodash";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import { storeToRefs } from "pinia";
 import axios from "axios";
 const { token } = storeToRefs(appStore.authStore);
@@ -90,44 +90,68 @@ const addArticle = async () => {
 
 const toUrl = () => {
   previewVisible.value = true;
-  previewUrl.value = `https://yujing.qingtime.cn/#/preview/${lessonInfo.value?._key}?token=${token.value}&type=back&index=${props.mediaIndex}`;
+  previewUrl.value = `https://cjyy.qingtime.cn/#/preview/${lessonInfo.value?._key}?token=${token.value}&type=back&index=${props.mediaIndex}`;
 };
 
 const updatetArticle = async (file) => {
-  const formData = new FormData();
-  formData.append("file", file);
-  const createRes = (await axios.post(
-    "https://nodeserver.qingtime.cn/upload",
-    formData,
+  ElMessageBox.confirm(
+    "上传文件为excel,且表头为original与translation",
+    "提示信息",
     {
-      // 因为我们上传了图片,因此需要单独执行请求头的Content-Type
-      headers: {
-        // 表示上传的是文件,而不是普通的表单数据
-        "Content-Type": "multipart/form-data",
-        token: token.value,
-      },
+      confirmButtonText: "确认",
+      cancelButtonText: "取消",
+      type: 'warning',
     }
-  )) as ResultProps;
-  if (createRes.data.msg === "OK") {
-    ElMessage.success("上传文件成功,导入中...");
-    importArticle(createRes.data.filePath);
-    // isUTF8.value = fileContent.indexOf("�") === -1;
-    // console.log(isUTF8.value);
-  }
+  ).then(async () => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const createRes = (await axios.post(
+      "https://nodeserver.qingtime.cn/upload",
+      formData,
+      {
+        // 因为我们上传了图片,因此需要单独执行请求头的Content-Type
+        headers: {
+          // 表示上传的是文件,而不是普通的表单数据
+          "Content-Type": "multipart/form-data",
+          token: token.value,
+        },
+      }
+    )) as ResultProps;
+    if (createRes.data.msg === "OK") {
+      // ElMessage.success("上传文件成功,导入中...");
+      importArticle(createRes.data.filePath);
+      // isUTF8.value = fileContent.indexOf("�") === -1;
+      // console.log(isUTF8.value);
+    }
+  });
 };
 const importArticle = async (filePath) => {
   loading.value = true;
-  const importRes = (await api.request.post("media/import/text", {
+  const importRes = (await api.request.post("section/import", {
     filePath: filePath,
     mediaKey: props.mediaKey,
   })) as ResultProps;
   if (importRes.msg === "OK") {
     loading.value = false;
     ElMessage.success("导入成功");
-    getArticle();
+    getData();
   }
 };
-const deleteArticle = (key, index) => {};
+const deleteArticle = (key, index) => {
+  ElMessageBox.confirm("是否删除段落", "删除段落", {
+    confirmButtonText: "确认",
+    cancelButtonText: "取消",
+  }).then(async () => {
+    const delRes = (await api.request.delete("section", {
+      mediaKey: props.mediaKey,
+      sectionKey: key,
+    })) as ResultProps;
+    if (delRes.msg === "OK") {
+      ElMessage.success("删除文章成功");
+      articleList.splice(index, 1);
+    }
+  });
+};
 const rowDrop = () => {
   // 要侦听拖拽响应的DOM对象
   const tbody = document.querySelector(".el-table__body-wrapper tbody");
@@ -173,17 +197,18 @@ watch(
         plain
         >新增</el-button
       >
-      <!-- <div class="upload-button" style="margin-left: 10px">
-        <el-button type="primary" class="common-button">导入文章</el-button>
+      <div class="upload-button" style="margin-left: 10px">
+        <el-button type="primary">导入文章</el-button>
         <input
           type="file"
           @change="
             //@ts-ignore
             updatetArticle($event.target.files[0])
           "
+          accept=".xls,.xslx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
           class="upload-img"
         />
-      </div> -->
+      </div>
     </template>
   </Header>
   <!-- <el-input
@@ -193,7 +218,7 @@ watch(
       type="textarea"
       placeholder="请输入文章内容"
     /> -->
-  <div class="article">
+  <div class="article box">
     <el-table
       :data="articleList"
       row-key="_key"
@@ -247,7 +272,7 @@ watch(
         <div class="article-left">
           <el-input
             v-model="original"
-            :autosize="{ minRows: 20 }"
+            :autosize="{ minRows: 15 }"
             type="textarea"
             placeholder="请输入英文原文"
           />
@@ -255,7 +280,7 @@ watch(
         <div class="article-right">
           <el-input
             v-model="translation"
-            :autosize="{ minRows: 20 }"
+            :autosize="{ minRows: 15 }"
             type="textarea"
             placeholder="请输入中文译文"
           />
@@ -272,20 +297,21 @@ watch(
 </template>
 <style scoped lang="scss">
 .article {
-  @include scroll();
   @include p-number(10px, 25px);
   .article-box {
     width: 100%;
-    height: 60vh;
+    margin-bottom: 15px;
     @include p-number(10px, 35px);
     @include flex(space-between, center, null);
     .article-left {
       width: 48%;
-      height: 100%;
+      height: 50vh;
+      @include scroll();
     }
     .article-right {
       width: 48%;
-      height: 100%;
+      height: 50vh;
+      @include scroll();
     }
   }
   .preview-url-box {
