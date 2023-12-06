@@ -10,7 +10,7 @@ const props = defineProps<{
     count: number;
   }[];
 }>();
-const dayjs: any = inject("dayjs");
+
 let chart: any | null = null;
 let option: echarts.EChartsOption | null = null;
 const xAxisData = ref<any>(null);
@@ -25,8 +25,8 @@ onMounted(() => {
   });
   let chartDom: any = document.getElementById(props.lineId);
   chart = echarts.init(chartDom, {
-    width: deviceWidth.value * 0.33,
-    height: deviceHeight.value * 0.2,
+    width: chartDom.parentElement.offsetWidth * 0.8,
+    height: chartDom.parentElement.offsetHeight * 0.8,
   });
 
   option = {

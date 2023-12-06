@@ -74,7 +74,7 @@ watchEffect(() => {
 <template>
   <Header title="课件管理" />
   <div class="lesson box">
-    <div class="lesson-header @include flex(flex-start, flex-start, null);">
+    <div class="lesson-header">
       <div class="lesson-header-left">
         <template v-for="(item, index) in statusArray" :key="`status${index}`">
           <span

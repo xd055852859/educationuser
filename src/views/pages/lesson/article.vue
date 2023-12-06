@@ -147,7 +147,7 @@ const deleteArticle = (key, index) => {
       sectionKey: key,
     })) as ResultProps;
     if (delRes.msg === "OK") {
-      ElMessage.success("删除文章成功");
+      ElMessage.success("删除段落成功");
       articleList.splice(index, 1);
     }
   });
@@ -179,7 +179,7 @@ watch(
 );
 </script>
 <template>
-  <Header :title="`${mediaName}文章`" backState @backFunc="$router.back()">
+  <Header :title="`${mediaName}`" backState @backFunc="$router.back()">
     <template #button>
       <el-button
         type="primary"

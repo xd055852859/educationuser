@@ -32,6 +32,7 @@ interface RuleForm {
   tagType: string;
   tagArr: any;
   mediaType: string;
+  language: string;
 }
 const ruleFormRef = ref<FormInstance>();
 const ruleForm = reactive<RuleForm>({
@@ -41,6 +42,7 @@ const ruleForm = reactive<RuleForm>({
   tagType: "inner",
   tagArr: [],
   mediaType: "pdf",
+  language: "en",
 });
 const rules = reactive<FormRules<RuleForm>>({
   name: [
@@ -93,6 +95,10 @@ const updateGrounding = async () => {
   }
 };
 const submitForm = async (formEl: FormInstance | undefined) => {
+  if (!ruleForm.name.trim()) {
+    ElMessage.error("请输入标题");
+    return;
+  }
   if (!ruleForm.cover) {
     ElMessage.error("请上传封面");
     return;
@@ -101,7 +107,10 @@ const submitForm = async (formEl: FormInstance | undefined) => {
     ElMessage.error("请选择标签");
     return;
   }
-  if (!formEl) return;
+  if (!formEl) {
+    ElMessage.error("请输入内容");
+    return;
+  }
   await formEl.validate(async (valid, fields) => {
     if (valid) {
       let obj = {
@@ -111,6 +120,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         tagArr: ruleForm.tagArr,
         tagType: ruleForm.tagType,
         mediaType: ruleForm.mediaType,
+        language: ruleForm.language,
       };
       if (lessonKey.value) {
         const lessonRes = (await api.request.patch("resource", {
@@ -152,6 +162,7 @@ watch(
       ruleForm.cover = newInfo.cover;
       ruleForm.description = newInfo.description;
       ruleForm.tagType = newInfo.tagType ? newInfo.tagType : "inner";
+      ruleForm.language = newInfo.language ? newInfo.language : "en";
       if (ruleForm.tagType !== lessonInfo.value.tagType) {
         ruleForm.tagArr = [];
       } else {
@@ -286,6 +297,7 @@ watch(
           <el-radio label="outer">课外泛读</el-radio>
         </el-radio-group>
       </el-form-item>
+
       <el-form-item
         label="标签"
         prop="tagArr"
@@ -338,6 +350,17 @@ watch(
           >
           <el-radio label="audio">音频</el-radio>
           <!-- <el-radio label="note">生词本</el-radio> -->
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item
+        label="字幕语言"
+        prop="cover"
+        style="margin-top: 35px; margin-bottom: 35px"
+        v-if="ruleForm.mediaType === 'video' || ruleForm.mediaType === 'audio'"
+      >
+        <el-radio-group v-model="ruleForm.language" size="large">
+          <el-radio label="en">英文</el-radio>
+          <el-radio label="cn">中文</el-radio>
         </el-radio-group>
       </el-form-item>
     </el-form>

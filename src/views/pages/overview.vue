@@ -15,7 +15,7 @@ const overViewData = ref<any>({
 });
 const unit = ref<string>("week");
 const chartData = ref<{ time: number; count: number }[] | null>([]);
-onMounted(() => {});
+onMounted(() => { });
 const getData = async () => {
   let dataRes = (await api.request.get("developer/statis", {
     developerKey: spaceKey.value,
@@ -68,46 +68,37 @@ watchEffect(() => {
         </div>
         <div class="header-card-right">
           <div class="header-card-icon">
-            <FontIcon
-              iconName="kejianshuliang"
-              :iconStyle="{ color: '##505AFF' }"
-            />
+            <FontIcon iconName="kejianshuliang" :iconStyle="{ color: '#505AFF' }" />
           </div>
         </div>
       </div>
       <div class="header-card">
         <div class="header-card-left">
-          <div class="header-title">订阅数量</div>
+          <div class="header-title">订阅角色数量</div>
           <div class="header-content">{{ overViewData.userNum }}</div>
         </div>
         <div class="header-card-right">
           <div class="header-card-icon">
-            <FontIcon
-              iconName="a-dingyueyonghu2"
-              :iconStyle="{ color: '##505AFF' }"
-            />
+            <FontIcon iconName="a-dingyueyonghu2" :iconStyle="{ color: '#505AFF' }" />
           </div>
         </div>
       </div>
     </div>
     <div class="overview-box">
       <div class="overview-title">
-        <div class="overview-title-left">订阅用户</div>
+        <div class="overview-title-left">订阅角色</div>
         <div class="overview-title-right">
-          <span @click="unit = 'today'" :style="unit === 'today'?{color:'#4c56ff'}:{}">日</span>
+          <span @click="unit = 'today'" :style="unit === 'today' ? { color: '#4c56ff' } : {}">日</span>
           <el-divider direction="vertical" />
-          <span @click="unit = 'week'" :style="unit === 'week'?{color:'#4c56ff'}:{}">周</span>
+          <span @click="unit = 'week'" :style="unit === 'week' ? { color: '#4c56ff' } : {}">周</span>
           <el-divider direction="vertical" />
-          <span @click="unit = 'month'" :style="unit === 'month'?{color:'#4c56ff'}:{}">月</span>
+          <span @click="unit = 'month'" :style="unit === 'month' ? { color: '#4c56ff' } : {}">月</span>
           <el-divider direction="vertical" />
-          <span @click="unit = 'year'" :style="unit === 'year'?{color:'#4c56ff'}:{}">年</span>
+          <span @click="unit = 'year'" :style="unit === 'year' ? { color: '#4c56ff' } : {}">年</span>
         </div>
       </div>
       <div class="overview-content" v-if="chartData">
-        <line-chart
-          line-id="board-chart"
-          :chart-data="chartData"
-        />
+        <line-chart line-id="board-chart" :chart-data="chartData" />
       </div>
     </div>
   </div>
@@ -116,11 +107,13 @@ watchEffect(() => {
 .overview {
   padding: 40px 57px 34px 57px;
   box-sizing: border-box;
+
   .overview-header {
     width: 100%;
     height: 170px;
     margin-bottom: 20px;
     @include flex(space-between, center, null);
+
     .header-card {
       width: 774px;
       height: 189px;
@@ -131,15 +124,17 @@ watchEffect(() => {
       box-sizing: border-box;
       margin-bottom: 40px;
       @include flex(space-between, center, null);
+
       .header-card-left {
         .header-title {
-          width: 100px;
+          width: 120px;
           height: 26px;
           font-size: 20px;
           color: #4b4c4b;
           line-height: 26px;
           margin-bottom: 10px;
         }
+
         .header-content {
           width: 79px;
           height: 69px;
@@ -149,12 +144,14 @@ watchEffect(() => {
           line-height: 69px;
         }
       }
+
       .header-card-right {
         width: 112px;
         height: 112px;
         background: rgba(207, 209, 252, 0.53);
         border-radius: 50%;
         @include flex(center, center, null);
+
         .header-card-icon {
           width: 44px;
           height: 44px;
@@ -162,28 +159,34 @@ watchEffect(() => {
       }
     }
   }
+
   .overview-box {
     width: 1560px;
     height: 620px;
     border: 1px solid #e3e3e3;
     padding: 20px 25px;
     box-sizing: border-box;
+
     .overview-title {
       width: 100%;
       height: 40px;
 
       @include flex(space-between, center, null);
+
       .overview-title-left {
         font-size: 24px;
       }
+
       .overview-title-right {
         font-size: 20px;
-        > span {
+
+        >span {
           cursor: pointer;
           color: var(--el-color-info-light-3);
         }
       }
     }
+
     .overview-content {
       width: 100%;
       height: calc(100% - 40px);

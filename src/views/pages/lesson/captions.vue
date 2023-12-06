@@ -43,7 +43,7 @@ const isUTF8 = ref<boolean>(false);
 const mediaName = ref<string>("");
 const previewVisible = ref<boolean>(false);
 const previewUrl = ref<string>("");
-
+const uploadInput = ref<string>("");
 onMounted(() => {
   if (videoRef.value) {
     videoRef.value.pause();
@@ -89,10 +89,10 @@ const onCanplay = (ev) => {
   console.log(ev, "可以播放");
 };
 const addCaptions = async () => {
-  if (!/[a-zA-Z]+/.test(original.value)) {
-    ElMessage.error("请输入英文原文");
-    return;
-  }
+  // if (!/[a-zA-Z]+/.test(original.value)) {
+  //   ElMessage.error("请输入英文原文");
+  //   return;
+  // }
   let startTime = dayjs
     .duration({
       seconds: startSeconds.value,
@@ -272,6 +272,7 @@ const importCaptions = async (filePath) => {
     loading.value = false;
     ElMessage.success("导入成功");
     getData();
+    uploadInput.value = "";
   }
 };
 const removeCaptions = async () => {
@@ -297,80 +298,33 @@ const toUrl = () => {
 <template>
   <Header :title="mediaName" backState @backFunc="$router.back">
     <template #button>
-      <el-button
-        type="primary"
-        style="margin-right: 5px"
-        plain
-        class="common-button"
-        @click="toUrl()"
-        >预览</el-button
-      >
-      <el-button
-        type="primary"
-        style="margin-right: 5px"
-        plain
-        class="common-button"
-        @click="removeCaptions()"
-        >清空字幕</el-button
-      >
-      <el-button
-        type="primary"
-        style="margin-right: 5px"
-        @click="addCaptions"
-        plain
-        class="common-button"
-        >保存</el-button
-      >
+      <el-button type="primary" style="margin-right: 5px" plain class="common-button" @click="toUrl()">预览</el-button>
+      <el-button type="primary" style="margin-right: 5px" plain class="common-button"
+        @click="removeCaptions()">清空字幕</el-button>
+      <el-button type="primary" style="margin-right: 5px" @click="addCaptions" plain class="common-button">保存</el-button>
       <div class="upload-button" style="margin-left: 10px">
         <el-button type="primary" class="common-button">导入字幕</el-button>
-        <input
-          type="file"
-          @change="
-            //@ts-ignore
-            updateCaptions($event.target.files[0])
-          "
-          class="upload-img"
-        />
+        <input type="file" :value="uploadInput" @change="
+          //@ts-ignore
+          updateCaptions($event.target.files[0])
+          " class="upload-img" />
       </div>
     </template>
   </Header>
   <div class="captions box" v-if="lessonInfo">
     <!--         :poster="options.poster" -->
-    <div
-      class="captions-video"
-      :style="{
-        height: lessonInfo?.mediaType === 'video' ? 'calc(55% - 10px)' : '80px',
-      }"
-    >
-      <videoPlay
-        id="captionsVideo"
-        ref="videoRef"
-        width="100%"
-        height="100%"
-        title="钢铁侠"
-        :src="videoSrc"
-        @play="onPlay"
-        @pause="onPause"
-        @timeupdate="onTimeupdate"
-        @canplay="onCanplay"
-        crossOrigin="Anonymous"
-      />
+    <div class="captions-video" :style="{
+      height: lessonInfo?.mediaType === 'video' ? 'calc(55% - 10px)' : '80px',
+    }">
+      <videoPlay id="captionsVideo" ref="videoRef" width="100%" height="100%" :src="videoSrc" @play="onPlay"
+        @pause="onPause" @timeupdate="onTimeupdate" @canplay="onCanplay" crossOrigin="Anonymous" />
     </div>
-    <div
-      class="captions-form"
-      :style="{
-        height: lessonInfo?.mediaType === 'video' ? '45%' : 'calc(100% - 80px)',
-      }"
-    >
+    <div class="captions-form" :style="{
+      height: lessonInfo?.mediaType === 'video' ? '45%' : 'calc(100% - 80px)',
+    }">
       <div class="captions-table">
-        <el-table
-          :data="captionsList"
-          fit
-          style="width: 100%; height: 100%"
-          @row-click="chooseCaptions"
-          stripe
-          v-loading="loading"
-        >
+        <el-table :data="captionsList" fit style="width: 100%; height: 100%" @row-click="chooseCaptions" stripe
+          v-loading="loading">
           <el-table-column prop="name" label="时间" align="center">
             <template #default="scope">
               {{
@@ -390,24 +344,14 @@ const toUrl = () => {
             <template #default="scope">
               <div class="captions-table-text">
                 {{ scope.row.original }}
-              </div></template
-            >
+              </div>
+            </template>
           </el-table-column>
 
-          <el-table-column
-            fixed="right"
-            label="操作"
-            width="100"
-            align="center"
-          >
+          <el-table-column fixed="right" label="操作" width="100" align="center">
             <template #default="scope">
-              <el-button
-                link
-                type="primary"
-                size="small"
-                @click="deleteCaptions(scope.row._key, scope.$index)"
-                >删除</el-button
-              >
+              <el-button link type="primary" size="small"
+                @click="deleteCaptions(scope.row._key, scope.$index)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -416,102 +360,50 @@ const toUrl = () => {
         <div class="input-item">
           <div class="left">起始时间</div>
           <div class="right">
-            <el-input
-              v-model="startHours"
-              placeholder="时"
-              style="width: 80px; margin-right: 10px"
-              :max="hours"
-              :min="0"
-              type="number"
-            />
+            <el-input v-model="startHours" placeholder="时" style="width: 80px; margin-right: 10px" :max="hours" :min="0"
+              type="number" />
             时
-            <el-input
-              v-model="startMinutes"
-              placeholder="分"
-              style="width: 80px; margin-left: 10px; margin-right: 10px"
-              :max="minutes"
-              :min="0"
-              type="number"
-            />
+            <el-input v-model="startMinutes" placeholder="分" style="width: 80px; margin-left: 10px; margin-right: 10px"
+              :max="minutes" :min="0" type="number" />
             分
-            <el-input
-              v-model="startSeconds"
-              placeholder="秒"
-              style="width: 80px; margin-left: 10px; margin-right: 10px"
-              :max="seconds"
-              :min="0"
-              type="number"
-            />
+            <el-input v-model="startSeconds" placeholder="秒" style="width: 80px; margin-left: 10px; margin-right: 10px"
+              :max="seconds" :min="0" type="number" />
           </div>
         </div>
         <div class="input-item">
           <div class="left">结束时间</div>
           <div class="right">
-            <el-input
-              v-model="endHours"
-              placeholder="时"
-              style="width: 80px; margin-right: 10px"
-              :max="hours"
-              :min="0"
-              type="number"
-            />
+            <el-input v-model="endHours" placeholder="时" style="width: 80px; margin-right: 10px" :max="hours" :min="0"
+              type="number" />
             时
-            <el-input
-              v-model="endMinutes"
-              placeholder="分"
-              style="width: 80px; margin-left: 10px; margin-right: 10px"
-              :max="hours && endHours < hours ? 60 : minutes"
-              :min="0"
-              type="number"
-            />
+            <el-input v-model="endMinutes" placeholder="分" style="width: 80px; margin-left: 10px; margin-right: 10px"
+              :max="hours && endHours < hours ? 60 : minutes" :min="0" type="number" />
             分
-            <el-input
-              v-model="endSeconds"
-              placeholder="秒"
-              style="width: 80px; margin-left: 10px; margin-right: 10px"
-              :max="minutes && endMinutes < minutes ? 60 : seconds"
-              :min="0"
-              type="number"
-            />
+            <el-input v-model="endSeconds" placeholder="秒" style="width: 80px; margin-left: 10px; margin-right: 10px"
+              :max="minutes && endMinutes < minutes ? 60 : seconds" :min="0" type="number" />
           </div>
         </div>
         <div class="input-item info-area">
           <div class="left">截屏</div>
           <div class="right">
-            <el-button
-              type="primary"
-              style="margin-right: 5px"
-              @click="getImg()"
-              >截屏</el-button
-            >
-            <el-image
-              style="width: 140px; height: 100px; margin-left: 15px"
-              :src="snap"
-              :zoom-rate="1.2"
-              :preview-src-list="[snap]"
-              :initial-index="0"
-              fit="cover"
-              v-if="snap"
-            />
+            <el-button type="primary" style="margin-right: 5px" @click="getImg()">截屏</el-button>
+            <el-image style="width: 140px; height: 100px; margin-left: 15px" :src="snap" :zoom-rate="1.2"
+              :preview-src-list="[snap]" :initial-index="0" fit="cover" v-if="snap" />
           </div>
         </div>
         <div class="input-item info-area">
           <div class="left">原文</div>
           <div class="right">
-            <el-input
-              v-model="original"
-              :rows="8"
-              type="textarea"
-              placeholder="请输入原文"
-              size="large"
-            />
+            <el-input v-model="original" :rows="8" type="textarea" placeholder="请输入原文" size="large" />
           </div>
         </div>
       </div>
     </div>
     <div class="preview-url-box" v-if="previewVisible">
       <div class="preview-url-icon" @click="previewVisible = false">
-        <el-icon color="#fff" size="40"><Close /></el-icon>
+        <el-icon color="#fff" size="40">
+          <Close />
+        </el-icon>
       </div>
       <div class="preview-url" v-if="previewUrl">
         <IframeView :url="previewUrl" />
@@ -522,30 +414,36 @@ const toUrl = () => {
 <style scoped lang="scss">
 .captions {
   @include p-number(10px, 25px);
+
   .captions-video {
     width: 100%;
     height: calc(55% - 10px);
     margin-bottom: 10px;
   }
+
   .captions-form {
     width: 100%;
     @include flex(space-between, center, null);
+
     .captions-table {
       width: calc(100% - 475px);
       margin-right: 15px;
       height: 100%;
+
       .captions-table-text {
         word-wrap: break-word;
         word-break: normal;
       }
     }
+
     .captions-input {
       width: 450px;
       height: 100%;
-      .input-item {
-      }
+
+      .input-item {}
     }
   }
+
   .preview-url-box {
     width: 100vw;
     height: 100vh;
@@ -553,6 +451,7 @@ const toUrl = () => {
     z-index: 10;
     top: 0px;
     left: 0px;
+
     .preview-url-icon {
       width: 50px;
       height: 50px;
@@ -562,6 +461,7 @@ const toUrl = () => {
       right: 30px;
       cursor: pointer;
     }
+
     .preview-url {
       width: 100%;
       height: 100%;

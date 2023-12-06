@@ -24,8 +24,11 @@ const fileVisible = ref<boolean>(false);
 const fileSize = ref<number>(0);
 const mediaTime = ref<number>(0);
 const loading = ref<boolean>(false);
-const inputKey = ref<string>("");
+const editLoading = ref<boolean>(false);
+const mediaKey = ref<string>("");
 const mediaName = ref<string>("");
+const mediaUrl = ref<string>("");
+const mediaType = ref<string>("");
 const ruleFormRef = ref<FormInstance>();
 const ruleForm = reactive<RuleForm>({
   name: "",
@@ -53,7 +56,7 @@ const getData = async () => {
     videoList.value = dataRes.data;
   }
 };
-const uploadImage = (file, type) => {
+const uploadImage = (file, type, index) => {
   let mimeType: any = [];
   switch (lessonInfo.value.mediaType) {
     case "video":
@@ -68,7 +71,15 @@ const uploadImage = (file, type) => {
     // case "note":
     // break;
   }
-  loading.value = true;
+  switch (type) {
+    case "url":
+      loading.value = true;
+      break;
+    case "mediaUrl":
+      editLoading.value = true;
+      break;
+  }
+
   if (file) {
     uploadFile(file, [], async (url, name) => {
       switch (type) {
@@ -77,6 +88,10 @@ const uploadImage = (file, type) => {
           console.log(file);
           fileSize.value = file.size;
           ruleForm.url = url;
+          break;
+        case "mediaUrl":
+          editLoading.value = false;
+          updateMedia(["url", "size"], [url, file.size], index);
           break;
       }
     });
@@ -99,7 +114,18 @@ const submitForm = (formEl: FormInstance | undefined) => {
   }
 };
 const saveForm = async (formEl: FormInstance | undefined) => {
-  if (!formEl) return;
+  if (!ruleForm.name || !ruleForm.name.trim()) {
+    ElMessage.error("请输入名称");
+    return;
+  }
+  if (!ruleForm.url) {
+    ElMessage.error("请上传资源");
+    return;
+  }
+  if (!formEl) {
+    ElMessage.error("请输入内容");
+    return;
+  }
   await formEl.validate(async (valid, fields) => {
     console.log(valid);
     if (valid) {
@@ -142,14 +168,22 @@ const deleteMedia = async (key, index) => {
     }
   });
 };
-const updateMedia = async (key, value, index) => {
+const updateMedia = async (keyArray, valueArray, index) => {
+  let obj: any = {};
+  keyArray.forEach((item, index) => {
+    obj[item] = valueArray[index];
+  });
   let updateRes = (await api.request.patch("media", {
-    mediaKey: inputKey.value,
-    [key]: value,
+    mediaKey: mediaKey.value,
+    ...obj,
   })) as ResultProps;
   if (updateRes.msg === "OK") {
-    videoList.value[index][key] = value;
-    inputKey.value = "";
+    videoList.value[index] = {
+      ...videoList.value[index],
+      ...obj,
+    };
+    mediaKey.value = "";
+    mediaType.value = "";
     mediaName.value = "";
   }
 };
@@ -174,7 +208,7 @@ const updateMedia = async (key, value, index) => {
           @click="fileVisible = true"
           >添加</el-button
         >
-        <el-button type="primary" size="small">批量导入</el-button>
+        <!-- <el-button type="primary" size="small">批量导入</el-button> -->
       </div>
     </div>
     <div class="media-table">
@@ -183,16 +217,20 @@ const updateMedia = async (key, value, index) => {
         <el-table-column label="名称" align="center">
           <template #default="scope">
             <el-input
+              :rows="3"
+              type="textarea"
               v-model="mediaName"
               placeholder="请输入资源名"
-              v-if="inputKey === scope.row._key"
-              @change="updateMedia('name', mediaName, scope.$index)"
+              v-if="mediaKey === scope.row._key && mediaType === 'name'"
+              @blur="updateMedia(['name'], [mediaName], scope.$index)"
               size="large"
+              autofocus
             />
             <div
               v-else
               @click="
-                inputKey = scope.row._key;
+                mediaType = 'name';
+                mediaKey = scope.row._key;
                 mediaName = scope.row.name;
               "
             >
@@ -201,11 +239,57 @@ const updateMedia = async (key, value, index) => {
           </template>
         </el-table-column>
         <el-table-column
-          prop="url"
           label="资源地址"
           header-align="center"
           v-if="lessonInfo.mediaType !== 'pdf'"
-        />
+        >
+          <template #default="scope">
+            <div v-if="mediaKey === scope.row._key && mediaType === 'url'">
+              <el-input
+                :rows="3"
+                type="textarea"
+                v-model="mediaName"
+                placeholder="请输入资源地址"
+                @blur="updateMedia(['url'], [mediaName], scope.$index)"
+                size="large"
+              />
+              <div class="user-set-upload">
+                <el-button type="primary" @click="" :loading="editLoading"
+                  >上传资源</el-button
+                >
+                <input
+                  type="file"
+                  :accept="
+                    lessonInfo.mediaType === 'video'
+                      ? 'video/*'
+                      : lessonInfo.mediaType === 'audio'
+                      ? 'audio/*'
+                      : 'application/pdf'
+                  "
+                  @change="
+                    uploadImage(
+                      //@ts-ignore
+                      $event.target.files[0],
+                      'mediaUrl',
+                      scope.$index
+                    )
+                  "
+                  class="upload-button"
+                />
+              </div>
+            </div>
+            <div
+              v-else
+              @click="
+                mediaType = 'url';
+                mediaKey = scope.row._key;
+                mediaName = scope.row.url;
+              "
+            >
+              {{ scope.row.url }}
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column
           label="时长"
           align="center"
@@ -325,7 +409,7 @@ const updateMedia = async (key, value, index) => {
                     "
                     @change="
                       //@ts-ignore
-                      uploadImage($event.target.files[0], 'url')
+                      uploadImage($event.target.files[0], 'url', -1)
                     "
                     class="upload-button"
                   />
@@ -356,6 +440,7 @@ const updateMedia = async (key, value, index) => {
 <style scoped lang="scss">
 .media {
   flex-wrap: wrap;
+
   .media-title {
     width: 100%;
     height: 50px;
@@ -363,26 +448,30 @@ const updateMedia = async (key, value, index) => {
     margin-bottom: 20px;
     @include flex(space-between, center, null);
   }
+
   .media-table {
     width: 100%;
     min-height: 250px;
   }
 }
+
 .user-set {
   height: 320px;
-  .user-set-upload {
-    position: relative;
-    z-index: 1;
-    .upload-button {
-      position: absolute;
-      z-index: 2;
-      top: 0px;
-      bottom: 0px;
-      left: 0px;
-      right: 0px;
-      opacity: 0;
-      cursor: pointer;
-    }
+}
+
+.user-set-upload {
+  position: relative;
+  z-index: 1;
+
+  .upload-button {
+    position: absolute;
+    z-index: 2;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    opacity: 0;
+    cursor: pointer;
   }
 }
 </style>

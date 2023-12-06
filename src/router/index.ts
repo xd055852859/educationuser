@@ -52,7 +52,7 @@ const routes: Array<RouteRecordRaw> = [
         children: [],
         props: true,
       },
-      
+
       {
         path: "member",
         name: "member",
@@ -70,6 +70,12 @@ const routes: Array<RouteRecordRaw> = [
         path: "message",
         name: "message",
         component: () => import("@/views/pages/message.vue"),
+        children: [],
+      },
+      {
+        path: "feedback",
+        name: "feedback",
+        component: () => import("@/views/pages/feedback.vue"),
         children: [],
       },
     ],

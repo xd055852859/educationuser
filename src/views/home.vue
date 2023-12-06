@@ -129,6 +129,16 @@ const logout = () => {
           </div>
           <div class="menu-title">成员管理</div>
         </div>
+        <div
+          class="home-menu-item"
+          @click="$router.push('/home/feedback')"
+          :style="$route.name === 'feedback' ? { background: '#dedffb' } : {}"
+        >
+          <div class="menu-logo dp--center">
+            <img src="/homelogo.svg" alt="" />
+          </div>
+          <div class="menu-title">用户反馈</div>
+        </div>
       </div>
     </div>
     <div class="home-right">
@@ -195,6 +205,10 @@ const logout = () => {
         .menu-logo {
           width: 24px;
           height: 100%;
+          img{
+            width:24px;
+            height:24px;
+          }
         }
         .menu-title {
           width: 90px;
