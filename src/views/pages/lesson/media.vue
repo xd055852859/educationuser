@@ -98,22 +98,6 @@ const uploadImage = (file, type, index) => {
   }
 };
 const submitForm = (formEl: FormInstance | undefined) => {
-  if (
-    (lessonInfo.value.mediaType === "video" ||
-      lessonInfo.value.mediaType === "audio") &&
-    ruleForm.uploadType === "inner"
-  ) {
-    console.log(ruleForm.url);
-    getUrlDuration(ruleForm.url, (time) => {
-      console.log(time);
-      mediaTime.value = time;
-      saveForm(formEl);
-    });
-  } else {
-    saveForm(formEl);
-  }
-};
-const saveForm = async (formEl: FormInstance | undefined) => {
   if (!ruleForm.name || !ruleForm.name.trim()) {
     ElMessage.error("请输入名称");
     return;
@@ -125,7 +109,24 @@ const saveForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) {
     ElMessage.error("请输入内容");
     return;
+  } else {
+    if (
+      (lessonInfo.value.mediaType === "video" ||
+        lessonInfo.value.mediaType === "audio") &&
+      ruleForm.uploadType === "inner"
+    ) {
+      console.log(ruleForm.url);
+      getUrlDuration(ruleForm.url, (time) => {
+        console.log(time);
+        mediaTime.value = time;
+        saveForm(formEl);
+      });
+    } else {
+      saveForm(formEl);
+    }
   }
+};
+const saveForm = async (formEl: FormInstance) => {
   await formEl.validate(async (valid, fields) => {
     console.log(valid);
     if (valid) {

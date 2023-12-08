@@ -26,7 +26,7 @@ onMounted(() => {
   let chartDom: any = document.getElementById(props.lineId);
   chart = echarts.init(chartDom, {
     width: chartDom.parentElement.offsetWidth * 0.8,
-    height: chartDom.parentElement.offsetHeight * 0.8,
+    height: chartDom.parentElement.offsetHeight * 0.7,
   });
 
   option = {

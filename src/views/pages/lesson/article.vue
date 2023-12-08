@@ -148,7 +148,8 @@ const deleteArticle = (key, index) => {
     })) as ResultProps;
     if (delRes.msg === "OK") {
       ElMessage.success("删除段落成功");
-      articleList.splice(index, 1);
+      console.log(index)
+      articleList.value.splice(index, 1);
     }
   });
 };
