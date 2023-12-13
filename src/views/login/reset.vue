@@ -98,14 +98,21 @@ const changeState = async () => {
       placeholder="请输入手机号"
       class="login-input"
       size="large"
-      autocomplete="new-password"
     >
     </el-input>
+
+    <el-input
+      v-model="password"
+      type="password"
+      placeholder="请输入密码"
+      show-password
+      class="login-input"
+      v-if="loginState !== 'codeLogin'"
+    />
     <div class="reset-code">
       <el-input
         v-model="code"
         placeholder="请输入验证码"
-        autocomplete="new-password"
         class="login-input"
         size="large"
         :style="{ width: 'calc(100% - 100px)', marginBottom: '0px' }"
@@ -120,16 +127,6 @@ const changeState = async () => {
         {{ codeState ? `剩余${codeTime}秒` : "获取验证码" }}
       </el-button>
     </div>
-
-    <el-input
-      v-model="password"
-      type="password"
-      placeholder="请输入密码"
-      show-password
-      class="login-input"
-      autocomplete="new-password"
-      v-if="loginState !== 'codeLogin'"
-    />
     <div class="login-bottom-button">
       <el-button type="primary" class="login-button" @click="changeState()">
         {{

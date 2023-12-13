@@ -28,6 +28,9 @@ export const commonStore = defineStore("commonStore", () => {
     deviceZoom.value = detectZoom();
     deviceWidth.value = width * deviceZoom.value;
     deviceHeight.value = height * deviceZoom.value;
+    //@ts-ignore
+    // document.body.style.zoom = deviceZoom.value;
+
     if (width < 550) {
       deviceSize.value = "xs";
     } else if (550 <= width) {

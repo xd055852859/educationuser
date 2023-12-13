@@ -374,7 +374,8 @@ export const detectZoom = () => {
     ratio = window.outerWidth / window.innerWidth;
   }
   if (ratio) {
-    ratio = Math.round(ratio * 100) / 100;
+    ratio = 100 / Math.round(ratio * 100);
   }
+  console.log(navigator.userAgent.toLowerCase());
   return ratio;
 };

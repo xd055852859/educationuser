@@ -161,7 +161,7 @@ watchEffect(() => {
             className="lesson-list-button"
             @click="$event.stopPropagation()"
             v-if="
-              spaceRole < 3 || (spaceRole === 4 && item.creator === user?._key)
+              spaceRole < 3 || (spaceRole === 3 && item.creator === user?._key)
             "
           >
             <el-dropdown

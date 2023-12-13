@@ -51,10 +51,15 @@ const getArticle = async () => {
   }
 };
 const addArticle = async () => {
+  if (original.value.length > 900) {
+    ElMessage.error("原文字数过多,请分段处理");
+    return;
+  }
   let obj: any = {
     original: original.value,
     translation: translation.value,
   };
+
   let dataRes: any = null;
   if (articleInfo.value) {
     dataRes = (await api.request.patch("section", {
@@ -81,13 +86,15 @@ const addArticle = async () => {
     } else {
       articleList.value.push(dataRes.data);
     }
-    articleInfo.value = null;
-    original.value = "";
-    translation.value = "";
-    articleVisible.value = false;
+    clearArticle();
   }
 };
-
+const clearArticle = () => {
+  articleInfo.value = null;
+  original.value = "";
+  translation.value = "";
+  articleVisible.value = false;
+};
 const toUrl = () => {
   previewVisible.value = true;
   previewUrl.value = `https://cjyy.qingtime.cn/#/preview/${lessonInfo.value?._key}?token=${token.value}&type=back&index=${props.mediaIndex}`;
@@ -100,7 +107,7 @@ const updatetArticle = async (file) => {
     {
       confirmButtonText: "确认",
       cancelButtonText: "取消",
-      type: 'warning',
+      type: "warning",
     }
   ).then(async () => {
     const formData = new FormData();
@@ -148,7 +155,7 @@ const deleteArticle = (key, index) => {
     })) as ResultProps;
     if (delRes.msg === "OK") {
       ElMessage.success("删除段落成功");
-      console.log(index)
+      console.log(index);
       articleList.value.splice(index, 1);
     }
   });
@@ -274,8 +281,10 @@ watch(
           <el-input
             v-model="original"
             :autosize="{ minRows: 15 }"
+            maxlength="900"
             type="textarea"
-            placeholder="请输入英文原文"
+            placeholder="请输入原文"
+            :show-word-limit="true"
           />
         </div>
         <div class="article-right">
@@ -283,13 +292,20 @@ watch(
             v-model="translation"
             :autosize="{ minRows: 15 }"
             type="textarea"
-            placeholder="请输入中文译文"
+            placeholder="请输入译文"
+            :show-word-limit="true"
           />
         </div>
       </div>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="articleVisible = false">取消</el-button>
+          <el-button
+            @click="
+              articleVisible = false;
+              clearArticle();
+            "
+            >取消</el-button
+          >
           <el-button type="primary" @click="addArticle()"> 确认 </el-button>
         </span>
       </template>

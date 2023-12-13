@@ -102,7 +102,7 @@ const submitForm = (formEl: FormInstance | undefined) => {
     ElMessage.error("请输入名称");
     return;
   }
-  if (!ruleForm.url) {
+  if (!ruleForm.url && lessonInfo.value.mediaType !== "pdf") {
     ElMessage.error("请上传资源");
     return;
   }

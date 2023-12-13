@@ -171,9 +171,9 @@ const outMember = () => {
 
         <el-table-column fixed="right" label="操作" width="180" align="center">
           <template #default="scope">
-            <el-button link type="primary" size="small" @click=""
+            <!-- <el-button link type="primary" size="small" @click=""
               >查看</el-button
-            >
+            > -->
             <el-button
               link
               type="primary"

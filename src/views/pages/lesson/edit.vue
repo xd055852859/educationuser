@@ -353,10 +353,9 @@ watch(
         </el-radio-group>
       </el-form-item>
       <el-form-item
-        label="字幕语言"
+        label="语言"
         prop="cover"
         style="margin-top: 35px; margin-bottom: 35px"
-        v-if="ruleForm.mediaType === 'video' || ruleForm.mediaType === 'audio'"
       >
         <el-radio-group v-model="ruleForm.language" size="large">
           <el-radio label="en">英文</el-radio>

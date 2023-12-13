@@ -96,7 +96,7 @@ watchEffect(() => {
       <div class="lesson-header-right"></div>
     </div>
     <div class="box-table">
-      <el-table :data="feedbackList" style="height: 100%" stripe>
+      <el-table :data="feedbackList" style="height: calc(100% - 10px)" stripe>
         <el-table-column
           prop="resourceName"
           label="课程"
